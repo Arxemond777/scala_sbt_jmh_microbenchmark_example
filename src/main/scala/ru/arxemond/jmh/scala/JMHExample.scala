@@ -9,7 +9,8 @@ import ru.arxemond.jmh.scala.JMHExample._
 /**
   * @author <a href="mailto:1arxemond1@gmail.com">Glushenkov Yuri</a>
   *
-  * sbt jmh:run -i 10 -wi 5 -f1 -t1
+  * > sbt
+  * > jmh:run -i 10 -wi 5 -f1 -t1
   * -i 10   - we want to run each benchmark with 10 iterations
   * -wi 5   - 5 warmup iterations
   * -f1     - fork once on each benchmark
@@ -19,7 +20,8 @@ import ru.arxemond.jmh.scala.JMHExample._
 @BenchmarkMode(Array(Mode.Throughput))
 class JMHExample {
 
-  /**
+  /** The answer example
+    *
     * [info] Result "parSeqMeasure":
     * [info]   0.042 ±(99.9%) 0.001 ops/ms [Average]
     * [info]   (min, avg, max) = (0.022, 0.042, 0.045), stdev = 0.004
@@ -71,9 +73,21 @@ class JMHExample {
 object JMHExample {
   @State(Scope.Benchmark)
   class SetState {
+
+    /**
+      * Explicit predefined stream. This value will not involve to the next benchmark measure
+      */
     final val stream: Stream[Int] = (1 to 1000000).toStream
 
     /**
+      * This val will be predefined in the method {@link JMHExample#doSetup}
+      * and cleared in the method  {@link JMHExample#tearDown}
+      */
+    var sum = 0
+
+    /**
+      * Refresh FOR EACH method. For example if there are 4-methods with the @Benchmark annotations, doSetup will be invoked 4 times
+      *
       * @see <a href="http://tutorials.jenkov.com/java-performance/jmh.html#state-setup-and-teardown">Got from</a>
       *
       * You can annotate methods in your state class with the @Setup
@@ -86,11 +100,13 @@ object JMHExample {
       * */
     @Setup(Level.Trial)
     def doSetup(): Unit = {
-      sum = 0
-      println("setup  performed")
+      sum = scala.util.Random.nextInt( (10 - 1) + 1 )
+      println(s"""setup  performed, sum: ${sum}""")
     }
 
     /**
+      * Refresh FOR EACH method. For example if there are 4-methods with the @Benchmark annotations, doSetup will be invoked 4 times
+      *
       * @see <a href="http://tutorials.jenkov.com/java-performance/jmh.html#state-setup-and-teardown">Got from</a>
       *
       * Level.Trial	The method is called once for each time for each full run of the benchmark.
@@ -100,9 +116,9 @@ object JMHExample {
       */
     @TearDown(Level.Trial)
     def tearDown(): Unit = {
-      println("tearDown performed")
+      sum = 0
+      println(s"""tearDown performed, sum: ${sum}""")
     }
 
-    var sum = 0
   }
 }

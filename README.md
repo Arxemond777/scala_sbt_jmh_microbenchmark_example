@@ -2,7 +2,8 @@
 
 ```
 # Run benchmark (for scala)
-sbt jmh:run -f1 -t1 -i 10 -wi 5
+> sbt   
+> jmh:run -f1 -t1 -i 10 -wi 5
 ```
 
 * -i 10   - we want to run each benchmark with 10 iterations  
